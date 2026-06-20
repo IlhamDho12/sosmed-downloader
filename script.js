@@ -458,6 +458,96 @@
         processDownload(urlInput.value);
     });
 
+    // Save File Button click handler (to fetch blob and force direct download without new tab)
+    resultDownloadLink.addEventListener('click', async (e) => {
+        const downloadUrl = resultDownloadLink.href;
+        if (!downloadUrl || downloadUrl === '#' || downloadUrl.startsWith('javascript:')) {
+            e.preventDefault();
+            return;
+        }
+
+        // If it's already a blob URL, let it download normally (same-origin, so no new tab)
+        if (downloadUrl.startsWith('blob:')) {
+            return;
+        }
+
+        e.preventDefault();
+
+        // Visual feedback - disable pointer events and opacity
+        resultDownloadLink.style.pointerEvents = 'none';
+        resultDownloadLink.style.opacity = '0.7';
+        const originalContent = resultDownloadLink.innerHTML;
+
+        try {
+            const response = await fetch(downloadUrl);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const reader = response.body.getReader();
+            
+            // Get total length from headers
+            const totalBytes = parseInt(response.headers.get('Estimated-Content-Length') || response.headers.get('Content-Length') || '0', 10);
+            
+            let receivedBytes = 0;
+            const chunks = [];
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                chunks.push(value);
+                receivedBytes += value.length;
+
+                if (totalBytes > 0) {
+                    const percent = Math.round((receivedBytes / totalBytes) * 100);
+                    resultDownloadLink.querySelector('span').textContent = `Mengunduh: ${percent}%`;
+                } else {
+                    const mb = (receivedBytes / (1024 * 1024)).toFixed(1);
+                    resultDownloadLink.querySelector('span').textContent = `Mengunduh: ${mb} MB`;
+                }
+            }
+
+            // Create blob and local object URL
+            const blob = new Blob(chunks);
+            const blobUrl = URL.createObjectURL(blob);
+            
+            // Extract filename from Content-Disposition header
+            const contentDisposition = response.headers.get('Content-Disposition') || '';
+            let filename = '';
+            const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            } else {
+                filename = resultTitle.textContent + (currentFormat === 'audio' ? '.mp3' : '.mp4');
+            }
+
+            // Trigger download using a temporary anchor tag
+            const tempLink = document.createElement('a');
+            tempLink.href = blobUrl;
+            tempLink.download = filename;
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+
+            // Reset button to original state
+            resultDownloadLink.innerHTML = originalContent;
+            resultDownloadLink.style.pointerEvents = 'auto';
+            resultDownloadLink.style.opacity = '1';
+
+            // Clean up blob URL after a short delay
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+
+        } catch (error) {
+            console.error('Blob download failed, falling back to direct navigation:', error);
+            // Reset button
+            resultDownloadLink.innerHTML = originalContent;
+            resultDownloadLink.style.pointerEvents = 'auto';
+            resultDownloadLink.style.opacity = '1';
+
+            // Fallback: Open in the same window (direct fallback)
+            window.location.href = downloadUrl;
+        }
+    });
+
     // Enter key on input
     urlInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
