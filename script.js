@@ -1,5 +1,5 @@
 // ========================================
-// SaveGrab — Social Media Downloader
+// IlhamdhoSaver — Social Media Downloader
 // Main Application Logic
 // ========================================
 
@@ -520,6 +520,6 @@
     urlInput.setAttribute('aria-label', 'Masukkan URL video dari sosial media');
     downloadBtn.setAttribute('aria-label', 'Download video atau audio');
 
-    console.log('🚀 SaveGrab initialized successfully');
+    console.log('🚀 IlhamdhoSaver initialized successfully');
     console.log(`📡 ${API_INSTANCES.length} API instances configured for fallback`);
 })();
