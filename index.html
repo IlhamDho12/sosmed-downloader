@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaveGrab — Download Video & Audio dari Sosial Media</title>
+    <meta name="description" content="Download video dan audio dari YouTube, TikTok, Instagram, Twitter, Facebook dan platform sosial media lainnya. Gratis, cepat, tanpa iklan.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+                    <path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
+                            <stop stop-color="#6366f1"/>
+                            <stop offset="1" stop-color="#a855f7"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>SaveGrab</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Fitur</a>
+                <a href="#platforms" class="nav-link">Platform</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main>
+        <section class="hero" id="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>100% Gratis & Tanpa Iklan</span>
+                </div>
+                <h1 class="hero-title">
+                    Download Video & Audio
+                    <span class="gradient-text">dari Sosial Media</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Simpan konten favorit dari YouTube, TikTok, Instagram, Twitter, dan platform lainnya. 
+                    Pilih format video atau audio sesuai kebutuhan kamu.
+                </p>
+
+                <!-- Download Box -->
+                <div class="download-box" id="downloadBox">
+                    <div class="input-wrapper">
+                        <div class="input-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                        </div>
+                        <input 
+                            type="url" 
+                            id="urlInput" 
+                            class="url-input" 
+                            placeholder="Tempel link video di sini..." 
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button class="paste-btn" id="pasteBtn" title="Tempel dari clipboard">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Format Options -->
+                    <div class="format-options">
+                        <div class="format-group">
+                            <button class="format-btn active" data-format="video" id="formatVideo">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="23 7 16 12 23 17 23 7"/>
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                                </svg>
+                                <span>Video</span>
+                            </button>
+                            <button class="format-btn" data-format="audio" id="formatAudio">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 18V5l12-2v13"/>
+                                    <circle cx="6" cy="18" r="3"/>
+                                    <circle cx="18" cy="16" r="3"/>
+                                </svg>
+                                <span>Audio</span>
+                            </button>
+                        </div>
+
+                        <!-- Quality Selector -->
+                        <div class="quality-selector" id="qualitySelector">
+                            <select id="qualitySelect" class="quality-select">
+                                <option value="1080">1080p</option>
+                                <option value="720" selected>720p</option>
+                                <option value="480">480p</option>
+                                <option value="360">360p</option>
+                            </select>
+                        </div>
+
+                        <div class="quality-selector audio-quality" id="audioQualitySelector" style="display:none;">
+                            <select id="audioQualitySelect" class="quality-select">
+                                <option value="320" selected>320kbps</option>
+                                <option value="256">256kbps</option>
+                                <option value="128">128kbps</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="download-btn" id="downloadBtn">
+                        <svg class="dl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span class="dl-text">Download Sekarang</span>
+                        <div class="dl-loader" style="display:none;">
+                            <div class="spinner"></div>
+                            <span>Memproses...</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Status messages -->
+                <div class="status-container" id="statusContainer" style="display:none;">
+                    <div class="status-card" id="statusCard">
+                        <div class="status-icon" id="statusIcon"></div>
+                        <div class="status-text" id="statusText"></div>
+                    </div>
+                </div>
+
+                <!-- Result Card -->
+                <div class="result-card" id="resultCard" style="display:none;">
+                    <div class="result-header">
+                        <div class="result-thumb" id="resultThumb">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="2" width="20" height="20" rx="4"/>
+                                <polygon points="10 8 16 12 10 16 10 8"/>
+                            </svg>
+                        </div>
+                        <div class="result-info">
+                            <h3 class="result-title" id="resultTitle">Video Title</h3>
+                            <p class="result-meta" id="resultMeta">Platform • Duration</p>
+                        </div>
+                    </div>
+                    <a class="result-download-btn" id="resultDownloadLink" href="#" target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span>Simpan File</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-badge">Kenapa SaveGrab?</span>
+                    <h2 class="section-title">Fitur <span class="gradient-text">Unggulan</span></h2>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="--accent: #6366f1;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <h3>Super Cepat</h3>
+                        <p>Proses download hanya dalam hitungan detik. Server kami dioptimasi untuk kecepatan maksimal.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="--accent: #a855f7;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+                        <h3>Aman & Privat</h3>
+                        <p>Tidak ada data yang disimpan. Semua proses berjalan aman tanpa tracking atau cookies.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="--accent: #ec4899;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                <line x1="4" y1="22" x2="4" y2="15"/>
+                            </svg>
+                        </div>
+                        <h3>100% Gratis</h3>
+                        <p>Tanpa biaya, tanpa langganan, tanpa batasan. Semua fitur bisa digunakan gratis sepenuhnya.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="--accent: #14b8a6;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </div>
+                        <h3>Multi Format</h3>
+                        <p>Download dalam format video (MP4) atau audio (MP3) dengan berbagai kualitas yang tersedia.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="--accent: #f59e0b;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                        <h3>Tanpa Login</h3>
+                        <p>Langsung pakai tanpa perlu membuat akun atau login. Cukup tempel link dan download.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="--accent: #06b6d4;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                                <line x1="12" y1="18" x2="12.01" y2="18"/>
+                            </svg>
+                        </div>
+                        <h3>Mobile Friendly</h3>
+                        <p>Desain responsif yang bekerja sempurna di semua perangkat, dari desktop hingga smartphone.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platforms Section -->
+        <section class="platforms" id="platforms">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-badge">Platform Didukung</span>
+                    <h2 class="section-title">Semua Platform <span class="gradient-text">Favoritmu</span></h2>
+                </div>
+                <div class="platforms-grid">
+                    <div class="platform-card" data-platform="youtube">
+                        <div class="platform-icon youtube">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                        </div>
+                        <span>YouTube</span>
+                    </div>
+                    <div class="platform-card" data-platform="tiktok">
+                        <div class="platform-icon tiktok">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                            </svg>
+                        </div>
+                        <span>TikTok</span>
+                    </div>
+                    <div class="platform-card" data-platform="instagram">
+                        <div class="platform-icon instagram">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                            </svg>
+                        </div>
+                        <span>Instagram</span>
+                    </div>
+                    <div class="platform-card" data-platform="twitter">
+                        <div class="platform-icon twitter">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </div>
+                        <span>X / Twitter</span>
+                    </div>
+                    <div class="platform-card" data-platform="facebook">
+                        <div class="platform-icon facebook">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </div>
+                        <span>Facebook</span>
+                    </div>
+                    <div class="platform-card" data-platform="reddit">
+                        <div class="platform-icon reddit">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+                            </svg>
+                        </div>
+                        <span>Reddit</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to use -->
+        <section class="how-to" id="howto">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-badge">Mudah Banget!</span>
+                    <h2 class="section-title">Cara <span class="gradient-text">Menggunakan</span></h2>
+                </div>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Copy Link</h3>
+                        <p>Salin URL video dari aplikasi sosial media yang kamu gunakan.</p>
+                    </div>
+                    <div class="step-connector">
+                        <svg viewBox="0 0 40 24" fill="none">
+                            <path d="M0 12h36M30 6l6 6-6 6" stroke="url(#connGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs><linearGradient id="connGrad" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+                        </svg>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Tempel & Pilih Format</h3>
+                        <p>Paste link di kolom di atas, lalu pilih format video atau audio.</p>
+                    </div>
+                    <div class="step-connector">
+                        <svg viewBox="0 0 40 24" fill="none">
+                            <path d="M0 12h36M30 6l6 6-6 6" stroke="url(#connGrad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs><linearGradient id="connGrad2" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#a855f7"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+                        </svg>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Download</h3>
+                        <p>Klik tombol download dan file akan langsung tersimpan di perangkatmu.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq" id="faq">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-badge">Pertanyaan Umum</span>
+                    <h2 class="section-title">FAQ</h2>
+                </div>
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary class="faq-question">
+                            <span>Apakah SaveGrab benar-benar gratis?</span>
+                            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </summary>
+                        <div class="faq-answer">
+                            <p>Ya! SaveGrab 100% gratis tanpa biaya tersembunyi, tanpa langganan, dan tanpa batasan jumlah download.</p>
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary class="faq-question">
+                            <span>Format apa saja yang didukung?</span>
+                            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </summary>
+                        <div class="faq-answer">
+                            <p>Kamu bisa download dalam format video (MP4) dengan kualitas hingga 1080p, atau audio saja (MP3/M4A) dengan bitrate hingga 320kbps.</p>
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary class="faq-question">
+                            <span>Apakah aman menggunakan SaveGrab?</span>
+                            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </summary>
+                        <div class="faq-answer">
+                            <p>Sangat aman. Kami tidak menyimpan data pribadi apapun. Semua proses dilakukan secara real-time dan tidak ada file yang disimpan di server kami.</p>
+                        </div>
+                    </details>
+                    <details class="faq-item">
+                        <summary class="faq-question">
+                            <span>Kenapa download saya gagal?</span>
+                            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </summary>
+                        <div class="faq-answer">
+                            <p>Pastikan link yang kamu masukkan valid dan video/audio tersebut bersifat publik (tidak private). Jika masih gagal, coba gunakan kualitas yang lebih rendah atau refresh halaman.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="#" class="nav-logo">
+                    <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="url(#logoGrad2)"/>
+                        <path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGrad2" x1="0" y1="0" x2="32" y2="32">
+                                <stop stop-color="#6366f1"/>
+                                <stop offset="1" stop-color="#a855f7"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>SaveGrab</span>
+                </a>
+                <p class="footer-desc">Download video dan audio dari platform sosial media favoritmu. Gratis, cepat, dan aman.</p>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SaveGrab. Dibuat dengan ❤️</p>
+                <p class="footer-disclaimer">SaveGrab tidak berafiliasi dengan platform manapun. Gunakan secara bertanggung jawab.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

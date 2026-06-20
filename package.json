@@ -1,0 +1,9 @@
+{
+  "name": "savegrab",
+  "version": "1.0.0",
+  "description": "Social Media Video & Audio Downloader",
+  "scripts": {
+    "dev": "npx -y serve -l 3000 -s .",
+    "start": "npx -y serve -l 3000 -s ."
+  }
+}

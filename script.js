@@ -1,0 +1,525 @@
+// ========================================
+// SaveGrab — Social Media Downloader
+// Main Application Logic
+// ========================================
+
+(function () {
+    'use strict';
+
+    // === DOM Elements ===
+    const urlInput = document.getElementById('urlInput');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const formatVideo = document.getElementById('formatVideo');
+    const formatAudio = document.getElementById('formatAudio');
+    const qualitySelector = document.getElementById('qualitySelector');
+    const audioQualitySelector = document.getElementById('audioQualitySelector');
+    const qualitySelect = document.getElementById('qualitySelect');
+    const audioQualitySelect = document.getElementById('audioQualitySelect');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusContainer = document.getElementById('statusContainer');
+    const statusCard = document.getElementById('statusCard');
+    const statusIcon = document.getElementById('statusIcon');
+    const statusText = document.getElementById('statusText');
+    const resultCard = document.getElementById('resultCard');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultMeta = document.getElementById('resultMeta');
+    const resultThumb = document.getElementById('resultThumb');
+    const resultDownloadLink = document.getElementById('resultDownloadLink');
+    const navbar = document.getElementById('navbar');
+
+    // === State ===
+    let currentFormat = 'video'; // 'video' | 'audio'
+    let isProcessing = false;
+
+    // === Cobalt API Instances (Community, sorted by reliability) ===
+    // These are open community instances from cobalt.directory that don't require auth.
+    // We use multiple instances as fallback for reliability.
+    const API_INSTANCES = [
+        'https://fox.kittycat.boo',
+        'https://dog.kittycat.boo',
+        'https://cobaltapi.kittycat.boo',
+        'https://rue-cobalt.xenon.zone',
+        'https://api.cobalt.liubquanti.click',
+        'https://api.cobalt.blackcat.sweeux.org',
+        'https://cobaltapi.cjs.nz',
+    ];
+
+    // Track which instance is currently working best
+    let currentInstanceIndex = 0;
+
+    // === Platform Detection ===
+    const PLATFORMS = {
+        youtube: {
+            name: 'YouTube',
+            patterns: [
+                /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/,
+            ],
+        },
+        tiktok: {
+            name: 'TikTok',
+            patterns: [
+                /tiktok\.com\/@[\w.-]+\/video\/(\d+)/,
+                /vm\.tiktok\.com\//,
+                /tiktok\.com\/t\//,
+            ],
+        },
+        instagram: {
+            name: 'Instagram',
+            patterns: [
+                /instagram\.com\/(?:p|reel|reels|tv)\/([a-zA-Z0-9_-]+)/,
+            ],
+        },
+        twitter: {
+            name: 'X / Twitter',
+            patterns: [
+                /(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/,
+            ],
+        },
+        facebook: {
+            name: 'Facebook',
+            patterns: [
+                /facebook\.com\/.*\/videos\//,
+                /facebook\.com\/watch/,
+                /facebook\.com\/reel\//,
+                /facebook\.com\/share\/v\//,
+                /fb\.watch\//,
+            ],
+        },
+        reddit: {
+            name: 'Reddit',
+            patterns: [
+                /reddit\.com\/r\/\w+\/comments\//,
+            ],
+        },
+    };
+
+    // === Utility Functions ===
+
+    function detectPlatform(url) {
+        for (const [key, platform] of Object.entries(PLATFORMS)) {
+            for (const pattern of platform.patterns) {
+                if (pattern.test(url)) {
+                    return { id: key, name: platform.name };
+                }
+            }
+        }
+        return null;
+    }
+
+    function isValidUrl(string) {
+        try {
+            const url = new URL(string);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch {
+            return false;
+        }
+    }
+
+    function showStatus(message, type = 'info') {
+        statusContainer.style.display = 'block';
+        statusCard.className = `status-card ${type}`;
+
+        const icons = {
+            error: '❌',
+            success: '✅',
+            info: 'ℹ️',
+        };
+
+        statusIcon.textContent = icons[type] || 'ℹ️';
+        statusText.textContent = message;
+
+        // Auto-hide after 8 seconds for non-error
+        if (type !== 'error') {
+            setTimeout(() => {
+                statusContainer.style.display = 'none';
+            }, 8000);
+        }
+    }
+
+    function hideStatus() {
+        statusContainer.style.display = 'none';
+    }
+
+    function setLoading(loading) {
+        isProcessing = loading;
+        downloadBtn.classList.toggle('loading', loading);
+
+        const dlIcon = downloadBtn.querySelector('.dl-icon');
+        const dlText = downloadBtn.querySelector('.dl-text');
+        const dlLoader = downloadBtn.querySelector('.dl-loader');
+
+        if (loading) {
+            dlIcon.style.display = 'none';
+            dlText.style.display = 'none';
+            dlLoader.style.display = 'flex';
+        } else {
+            dlIcon.style.display = 'block';
+            dlText.style.display = 'block';
+            dlLoader.style.display = 'none';
+        }
+    }
+
+    function showResult(data) {
+        resultCard.style.display = 'block';
+
+        resultTitle.textContent = data.title || 'Media dari Sosial Media';
+        resultMeta.textContent = data.meta || '';
+
+        // Set thumbnail
+        if (data.thumb) {
+            resultThumb.innerHTML = `<img src="${data.thumb}" alt="Thumbnail" onerror="this.parentElement.innerHTML='<svg viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'1.5\\'><rect x=\\'2\\' y=\\'2\\' width=\\'20\\' height=\\'20\\' rx=\\'4\\'/><polygon points=\\'10 8 16 12 10 16 10 8\\'/></svg>'">`;
+        }
+
+        resultDownloadLink.href = data.url;
+        resultDownloadLink.setAttribute('download', '');
+    }
+
+    function hideResult() {
+        resultCard.style.display = 'none';
+    }
+
+    // === Try a single Cobalt instance ===
+    async function tryInstance(apiUrl, requestBody) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+        try {
+            const response = await fetch(`${apiUrl}/`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+                signal: controller.signal,
+            });
+
+            clearTimeout(timeout);
+
+            if (!response.ok) {
+                const errorBody = await response.text().catch(() => '');
+                throw new Error(`HTTP ${response.status}: ${errorBody}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            clearTimeout(timeout);
+            throw error;
+        }
+    }
+
+    // === API Call with Fallback ===
+    async function processDownload(url) {
+        if (isProcessing) return;
+
+        hideStatus();
+        hideResult();
+
+        // Validate URL
+        if (!url || !url.trim()) {
+            showStatus('Silakan masukkan link video terlebih dahulu.', 'error');
+            urlInput.focus();
+            return;
+        }
+
+        if (!isValidUrl(url.trim())) {
+            showStatus('Link yang dimasukkan tidak valid. Pastikan dimulai dengan http:// atau https://', 'error');
+            return;
+        }
+
+        const platform = detectPlatform(url.trim());
+        if (!platform) {
+            showStatus('Platform tidak didukung. Coba link dari YouTube, TikTok, Instagram, Twitter, Facebook, atau Reddit.', 'error');
+            return;
+        }
+
+        setLoading(true);
+        showStatus(`Memproses link dari ${platform.name}...`, 'info');
+
+        // Build request body for cobalt API
+        const requestBody = {
+            url: url.trim(),
+            downloadMode: currentFormat === 'audio' ? 'audio' : 'auto',
+            filenameStyle: 'pretty',
+        };
+
+        // Add quality settings
+        if (currentFormat === 'video') {
+            requestBody.videoQuality = qualitySelect.value;
+        } else {
+            requestBody.audioFormat = 'mp3';
+            requestBody.audioBitrate = audioQualitySelect.value;
+        }
+
+        // Try instances with fallback
+        let lastError = null;
+        const startIndex = currentInstanceIndex;
+
+        for (let attempt = 0; attempt < API_INSTANCES.length; attempt++) {
+            const instanceIndex = (startIndex + attempt) % API_INSTANCES.length;
+            const apiUrl = API_INSTANCES[instanceIndex];
+
+            try {
+                showStatus(`Memproses dari ${platform.name}... (server ${attempt + 1})`, 'info');
+
+                const data = await tryInstance(apiUrl, requestBody);
+
+                if (data.status === 'error') {
+                    const errCode = data.error?.code || data.error || 'unknown';
+                    // If it's a content error (not server error), don't try other instances
+                    if (errCode.includes('content.') || errCode.includes('link.') || errCode.includes('fetch.empty')) {
+                        throw new ContentError(translateError(errCode));
+                    }
+                    throw new Error(errCode);
+                }
+
+                // Success! Remember this working instance for next time
+                currentInstanceIndex = instanceIndex;
+
+                if (data.status === 'redirect' || data.status === 'tunnel' || data.status === 'stream') {
+                    const downloadUrl = data.url;
+                    if (!downloadUrl) {
+                        throw new Error('Tidak ada URL download yang ditemukan.');
+                    }
+
+                    hideStatus();
+                    showResult({
+                        title: data.filename || `${currentFormat === 'audio' ? 'Audio' : 'Video'} dari ${platform.name}`,
+                        meta: `${platform.name} • ${currentFormat === 'video' ? qualitySelect.value + 'p' : audioQualitySelect.value + 'kbps'} • ${currentFormat.toUpperCase()}`,
+                        thumb: data.thumbnail || null,
+                        url: downloadUrl,
+                    });
+
+                    showStatus('Berhasil! Klik tombol "Simpan File" untuk download.', 'success');
+                    setLoading(false);
+                    return;
+
+                } else if (data.status === 'picker') {
+                    // Multiple options available (e.g. Instagram carousel)
+                    const firstPick = data.picker?.[0];
+                    if (firstPick?.url) {
+                        hideStatus();
+                        showResult({
+                            title: `Media dari ${platform.name}`,
+                            meta: `${platform.name} • ${currentFormat.toUpperCase()}`,
+                            thumb: firstPick.thumb || data.picker?.[0]?.thumb || null,
+                            url: firstPick.url,
+                        });
+                        showStatus('Berhasil! Klik tombol "Simpan File" untuk download.', 'success');
+                        setLoading(false);
+                        return;
+                    } else {
+                        throw new Error('Format media tidak didukung.');
+                    }
+                } else {
+                    throw new Error('Respons tidak dikenali dari server.');
+                }
+
+            } catch (error) {
+                lastError = error;
+
+                // If it's a content-level error, stop trying other servers
+                if (error instanceof ContentError) {
+                    break;
+                }
+
+                console.warn(`Instance ${apiUrl} failed:`, error.message);
+                // Continue to next instance
+            }
+        }
+
+        // All instances failed
+        const errorMessage = getFriendlyErrorMessage(lastError);
+
+        showStatus(errorMessage, 'error');
+        hideResult();
+        setLoading(false);
+    }
+
+    // Custom error class for content-level errors (no need to retry other servers)
+    class ContentError extends Error {
+        constructor(message) {
+            super(message);
+            this.name = 'ContentError';
+        }
+    }
+
+    // Get a friendly Indonesian error message from any error object
+    function getFriendlyErrorMessage(error) {
+        if (!error) return 'Terjadi kesalahan yang tidak diketahui. Coba lagi nanti.';
+
+        if (error instanceof ContentError) {
+            return error.message;
+        }
+
+        if (error.name === 'AbortError') {
+            return 'Server terlalu lambat merespons. Coba lagi nanti atau gunakan kualitas yang lebih rendah.';
+        }
+
+        const msg = error.message || '';
+        
+        if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('TypeError')) {
+            return 'Tidak dapat terhubung ke server. Periksa koneksi internet kamu atau coba lagi nanti.';
+        }
+
+        // Check if the error is an HTTP error containing JSON
+        if (msg.startsWith('HTTP ')) {
+            try {
+                const jsonStr = msg.substring(msg.indexOf('{'));
+                const errJson = JSON.parse(jsonStr);
+                const code = errJson.error?.code || errJson.error || '';
+                return translateError(code);
+            } catch (e) {
+                // fall through
+            }
+        }
+
+        return translateError(msg);
+    }
+
+    // Translate cobalt error codes to friendly Indonesian messages
+    function translateError(code) {
+        if (!code) return 'Terjadi kesalahan yang tidak diketahui.';
+
+        const translations = {
+            'error.api.fetch.empty': 'Konten ini tidak tersedia, sudah dihapus, atau bersifat private.',
+            'error.api.fetch.fail': 'Gagal mengambil data dari platform. Coba lagi nanti.',
+            'error.api.fetch.rate': 'Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.',
+            'error.api.content.video.unavailable': 'Video ini tidak tersedia atau sudah dihapus.',
+            'error.api.content.video.live': 'Live stream tidak bisa didownload.',
+            'error.api.content.video.private': 'Video ini bersifat private dan tidak bisa didownload.',
+            'error.api.content.video.age': 'Video ini memiliki batasan usia.',
+            'error.api.content.post.unavailable': 'Konten ini tidak tersedia atau sudah dihapus.',
+            'error.api.content.post.private': 'Konten ini bersifat private.',
+            'error.api.link.unsupported': 'Link ini tidak didukung.',
+            'error.api.youtube.login': 'YouTube memerlukan login untuk video ini. Coba video lain.',
+            'error.api.youtube.decipher': 'Gagal memproses video YouTube. Coba lagi nanti.',
+            'error.api.auth.jwt.missing': 'Server ini memerlukan autentikasi JWT (login/API key).',
+        };
+
+        // Check for exact matches first
+        if (translations[code]) {
+            return translations[code];
+        }
+
+        // Check for partial matches
+        for (const [key, msg] of Object.entries(translations)) {
+            if (code.includes(key.replace('error.api.', '')) || code.includes(key)) {
+                return msg;
+            }
+        }
+
+        // If it's already a friendly message
+        if (code.includes(' ') || code.length > 50) {
+            return code;
+        }
+
+        return `Terjadi kesalahan: ${code}`;
+    }
+
+    // === Event Listeners ===
+
+    // Paste button
+    pasteBtn.addEventListener('click', async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            urlInput.value = text;
+            urlInput.focus();
+
+            // Visual feedback
+            pasteBtn.style.color = '#22c55e';
+            setTimeout(() => {
+                pasteBtn.style.color = '';
+            }, 1000);
+        } catch {
+            showStatus('Tidak dapat mengakses clipboard. Silakan tempel secara manual (Ctrl+V).', 'error');
+        }
+    });
+
+    // Format toggle
+    formatVideo.addEventListener('click', () => {
+        currentFormat = 'video';
+        formatVideo.classList.add('active');
+        formatAudio.classList.remove('active');
+        qualitySelector.style.display = 'block';
+        audioQualitySelector.style.display = 'none';
+    });
+
+    formatAudio.addEventListener('click', () => {
+        currentFormat = 'audio';
+        formatAudio.classList.add('active');
+        formatVideo.classList.remove('active');
+        qualitySelector.style.display = 'none';
+        audioQualitySelector.style.display = 'block';
+    });
+
+    // Download button
+    downloadBtn.addEventListener('click', () => {
+        processDownload(urlInput.value);
+    });
+
+    // Enter key on input
+    urlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            processDownload(urlInput.value);
+        }
+    });
+
+    // Clear status when typing
+    urlInput.addEventListener('input', () => {
+        hideStatus();
+        hideResult();
+    });
+
+    // Navbar scroll effect
+    let lastScrollY = 0;
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        navbar.classList.toggle('scrolled', scrollY > 20);
+        lastScrollY = scrollY;
+    }, { passive: true });
+
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Add fade-in class to animatable elements
+    document.querySelectorAll('.feature-card, .platform-card, .step-card, .faq-item').forEach((el, i) => {
+        el.classList.add('fade-in');
+        el.style.transitionDelay = `${i * 0.05}s`;
+        observer.observe(el);
+    });
+
+    // === Smooth anchor scroll ===
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            // Jika href sudah berubah (bukan jangkar lokal diawali '#') atau hanya '#', biarkan aksi bawaan browser berjalan
+            if (!href || !href.startsWith('#') || href === '#') return;
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // === Keyboard Accessibility ===
+    urlInput.setAttribute('aria-label', 'Masukkan URL video dari sosial media');
+    downloadBtn.setAttribute('aria-label', 'Download video atau audio');
+
+    console.log('🚀 SaveGrab initialized successfully');
+    console.log(`📡 ${API_INSTANCES.length} API instances configured for fallback`);
+})();
