@@ -25,6 +25,7 @@
     const resultMeta = document.getElementById('resultMeta');
     const resultThumb = document.getElementById('resultThumb');
     const resultDownloadLink = document.getElementById('resultDownloadLink');
+    const resultTip = document.getElementById('resultTip');
     const navbar = document.getElementById('navbar');
 
     // === State ===
@@ -52,43 +53,41 @@
         youtube: {
             name: 'YouTube',
             patterns: [
-                /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/,
+                /youtube\.com/,
+                /youtu\.be/,
             ],
         },
         tiktok: {
             name: 'TikTok',
             patterns: [
-                /tiktok\.com\/@[\w.-]+\/video\/(\d+)/,
-                /vm\.tiktok\.com\//,
-                /tiktok\.com\/t\//,
+                /tiktok\.com/,
             ],
         },
         instagram: {
             name: 'Instagram',
             patterns: [
-                /instagram\.com\/(?:p|reel|reels|tv)\/([a-zA-Z0-9_-]+)/,
+                /instagram\.com/,
             ],
         },
         twitter: {
             name: 'X / Twitter',
             patterns: [
-                /(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/,
+                /twitter\.com/,
+                /x\.com/,
             ],
         },
         facebook: {
             name: 'Facebook',
             patterns: [
-                /facebook\.com\/.*\/videos\//,
-                /facebook\.com\/watch/,
-                /facebook\.com\/reel\//,
-                /facebook\.com\/share\/v\//,
-                /fb\.watch\//,
+                /facebook\.com/,
+                /fb\.watch/,
+                /fb\.com/,
             ],
         },
         reddit: {
             name: 'Reddit',
             patterns: [
-                /reddit\.com\/r\/\w+\/comments\//,
+                /reddit\.com/,
             ],
         },
     };
@@ -172,10 +171,19 @@
 
         resultDownloadLink.href = data.url;
         resultDownloadLink.setAttribute('download', '');
+
+        // Show mobile tips if on mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            resultTip.style.display = 'block';
+        } else {
+            resultTip.style.display = 'none';
+        }
     }
 
     function hideResult() {
         resultCard.style.display = 'none';
+        resultTip.style.display = 'none';
     }
 
     // === Try a single Cobalt instance ===
@@ -482,11 +490,24 @@
             const response = await fetch(downloadUrl);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            const reader = response.body.getReader();
-            
             // Get total length from headers
             const totalBytes = parseInt(response.headers.get('Estimated-Content-Length') || response.headers.get('Content-Length') || '0', 10);
             
+            // Check if file is too large for mobile RAM (e.g. > 25MB)
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile && totalBytes > 25 * 1024 * 1024) {
+                console.log(`File size (${(totalBytes / 1024 / 1024).toFixed(1)}MB) is too large for mobile memory download. Redirecting.`);
+                // Reset button immediately
+                resultDownloadLink.innerHTML = originalContent;
+                resultDownloadLink.style.pointerEvents = 'auto';
+                resultDownloadLink.style.opacity = '1';
+                
+                // Fallback to direct navigation
+                window.location.href = downloadUrl;
+                return;
+            }
+
+            const reader = response.body.getReader();
             let receivedBytes = 0;
             const chunks = [];
 
