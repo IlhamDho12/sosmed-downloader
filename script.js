@@ -27,6 +27,10 @@
     const resultDownloadLink = document.getElementById('resultDownloadLink');
     const resultTip = document.getElementById('resultTip');
     const navbar = document.getElementById('navbar');
+    const commentForm = document.getElementById('commentForm');
+    const commentName = document.getElementById('commentName');
+    const commentText = document.getElementById('commentText');
+    const commentsList = document.getElementById('commentsList');
 
     // === State ===
     let currentFormat = 'video'; // 'video' | 'audio'
@@ -626,6 +630,143 @@
             }
         });
     });
+
+    // === Comments & Reviews System ===
+    const defaultComments = [
+        {
+            name: "Rian Hidayat",
+            rating: 5,
+            text: "Keren banget IlhamdhoSaver! Download video YouTube FHD 1080p cepet banget prosesnya dan yang paling penting ga ada iklannya sama sekali. Sukses terus!",
+            date: "2026-06-25 15:30"
+        },
+        {
+            name: "Siti Rahma",
+            rating: 5,
+            text: "Akhirnya nemu downloader sosmed yang clean dan ga ribet. Tampilannya modern, pas banget dipake di HP Android saya langsung keliatan semua fiturnya.",
+            date: "2026-06-24 10:15"
+        },
+        {
+            name: "Budi Santoso",
+            rating: 4,
+            text: "Sangat membantu buat download reels Instagram dan video TikTok tanpa watermark. Tombol simpan langsung unduh di latar belakang top markotop!",
+            date: "2026-06-23 18:45"
+        }
+    ];
+
+    // Load comments from localStorage or fallback to default
+    let comments = [];
+    try {
+        const stored = localStorage.getItem('ilhamdhosaver_comments');
+        if (stored) {
+            comments = JSON.parse(stored);
+        } else {
+            comments = [...defaultComments];
+            localStorage.setItem('ilhamdhosaver_comments', JSON.stringify(comments));
+        }
+    } catch (e) {
+        console.warn('Failed to load comments from localStorage, using defaults.', e);
+        comments = [...defaultComments];
+    }
+
+    // Function to render comments
+    function renderComments() {
+        if (!commentsList) return;
+        commentsList.innerHTML = '';
+
+        comments.forEach(comment => {
+            const card = document.createElement('div');
+            card.className = 'comment-card';
+
+            // Get initials for avatar
+            const initials = comment.name ? comment.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+
+            // Generate stars HTML
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHtml += i <= comment.rating ? '★' : '☆';
+            }
+
+            card.innerHTML = `
+                <div class="comment-avatar">${initials}</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-name">${escapeHTML(comment.name)}</span>
+                        <div class="comment-meta">
+                            <span class="comment-stars">${starsHtml}</span>
+                            <span class="comment-date">${comment.date}</span>
+                        </div>
+                    </div>
+                    <p class="comment-body">${escapeHTML(comment.text)}</p>
+                </div>
+            `;
+            commentsList.appendChild(card);
+        });
+    }
+
+    // Escape HTML helper to prevent XSS in comments
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
+    // Submit comment form handler
+    if (commentForm) {
+        commentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const nameVal = commentName.value.trim();
+            const textVal = commentText.value.trim();
+            
+            // Get selected rating
+            const selectedRatingEl = commentForm.querySelector('input[name="rating"]:checked');
+            const ratingVal = selectedRatingEl ? parseInt(selectedRatingEl.value, 10) : 5;
+
+            if (!nameVal || !textVal) return;
+
+            // Form date string format: YYYY-MM-DD HH:MM
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const newComment = {
+                name: nameVal,
+                rating: ratingVal,
+                text: textVal,
+                date: dateStr
+            };
+
+            // Prepend new comment to list
+            comments.unshift(newComment);
+
+            // Save to localStorage
+            try {
+                localStorage.setItem('ilhamdhosaver_comments', JSON.stringify(comments));
+            } catch (err) {
+                console.error('Failed to save comment to localStorage', err);
+            }
+
+            // Render and reset form
+            renderComments();
+            commentForm.reset();
+
+            // Reset stars rating to 5
+            const star5 = document.getElementById('star-5');
+            if (star5) star5.checked = true;
+
+            // Show confirmation toast/status
+            showStatus('Komentar Anda berhasil dipublikasikan! Terima kasih.', 'success');
+        });
+    }
+
+    // Render initial comments
+    renderComments();
 
     // === Keyboard Accessibility ===
     urlInput.setAttribute('aria-label', 'Masukkan URL video dari sosial media');

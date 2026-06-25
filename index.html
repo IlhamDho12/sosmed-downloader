@@ -28,8 +28,8 @@
                     <path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <defs>
                         <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
-                            <stop stop-color="#6366f1"/>
-                            <stop offset="1" stop-color="#a855f7"/>
+                            <stop stop-color="#00f0ff"/>
+                            <stop offset="1" stop-color="#3b82f6"/>
                         </linearGradient>
                     </defs>
                 </svg>
@@ -138,6 +138,36 @@
                     </button>
                 </div>
 
+                <!-- Supported Platforms Quick List -->
+                <div class="platforms-quick-list" id="platformsQuickList">
+                    <div class="quick-chips">
+                        <div class="quick-chip youtube">
+                            <span class="chip-dot"></span>
+                            <span>YouTube</span>
+                        </div>
+                        <div class="quick-chip tiktok">
+                            <span class="chip-dot"></span>
+                            <span>TikTok</span>
+                        </div>
+                        <div class="quick-chip instagram">
+                            <span class="chip-dot"></span>
+                            <span>Instagram</span>
+                        </div>
+                        <div class="quick-chip twitter">
+                            <span class="chip-dot"></span>
+                            <span>X/Twitter</span>
+                        </div>
+                        <div class="quick-chip facebook">
+                            <span class="chip-dot"></span>
+                            <span>Facebook</span>
+                        </div>
+                        <div class="quick-chip reddit">
+                            <span class="chip-dot"></span>
+                            <span>Reddit</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Status messages -->
                 <div class="status-container" id="statusContainer" style="display:none;">
                     <div class="status-card" id="statusCard">
@@ -184,7 +214,7 @@
                 </div>
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #6366f1;">
+                        <div class="feature-icon" style="--accent: #00f0ff;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"/>
                                 <polyline points="12 6 12 12 16 14"/>
@@ -194,7 +224,7 @@
                         <p>Proses download hanya dalam hitungan detik. Server kami dioptimasi untuk kecepatan maksimal.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #a855f7;">
+                        <div class="feature-icon" style="--accent: #3b82f6;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                             </svg>
@@ -203,7 +233,7 @@
                         <p>Tidak ada data yang disimpan. Semua proses berjalan aman tanpa tracking atau cookies.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #ec4899;">
+                        <div class="feature-icon" style="--accent: #10b981;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
                                 <line x1="4" y1="22" x2="4" y2="15"/>
@@ -213,7 +243,7 @@
                         <p>Tanpa biaya, tanpa langganan, tanpa batasan. Semua fitur bisa digunakan gratis sepenuhnya.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #14b8a6;">
+                        <div class="feature-icon" style="--accent: #00ffaa;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
                                 <line x1="8" y1="21" x2="16" y2="21"/>
@@ -224,7 +254,7 @@
                         <p>Download dalam format video (MP4) atau audio (MP3) dengan berbagai kualitas yang tersedia.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #f59e0b;">
+                        <div class="feature-icon" style="--accent: #0ea5e9;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                                 <circle cx="9" cy="7" r="4"/>
@@ -236,7 +266,7 @@
                         <p>Langsung pakai tanpa perlu membuat akun atau login. Cukup tempel link dan download.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #06b6d4;">
+                        <div class="feature-icon" style="--accent: #38bdf8;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
                                 <line x1="12" y1="18" x2="12.01" y2="18"/>
@@ -325,7 +355,7 @@
                     <div class="step-connector">
                         <svg viewBox="0 0 40 24" fill="none">
                             <path d="M0 12h36M30 6l6 6-6 6" stroke="url(#connGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <defs><linearGradient id="connGrad" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+                            <defs><linearGradient id="connGrad" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#00f0ff"/></linearGradient></defs>
                         </svg>
                     </div>
                     <div class="step-card">
@@ -336,7 +366,7 @@
                     <div class="step-connector">
                         <svg viewBox="0 0 40 24" fill="none">
                             <path d="M0 12h36M30 6l6 6-6 6" stroke="url(#connGrad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <defs><linearGradient id="connGrad2" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#a855f7"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+                            <defs><linearGradient id="connGrad2" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#00f0ff"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
                         </svg>
                     </div>
                     <div class="step-card">
@@ -403,6 +433,54 @@
                 </div>
             </div>
         </section>
+
+        <!-- Comments Section -->
+        <section class="comments" id="comments">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-badge">Umpan Balik Pengguna</span>
+                    <h2 class="section-title">Kolom <span class="gradient-text">Komentar & Testimoni</span></h2>
+                </div>
+                
+                <!-- Comment Form -->
+                <div class="comment-form-card">
+                    <h3>Bagikan Pengalaman Anda</h3>
+                    <form id="commentForm" class="comment-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="commentName" placeholder="Nama Anda..." required autocomplete="name">
+                            </div>
+                            <div class="form-group rating-group">
+                                <span class="rating-label">Rating:</span>
+                                <div class="star-rating">
+                                    <input type="radio" name="rating" id="star-5" value="5" checked>
+                                    <label for="star-5" title="5 Bintang">★</label>
+                                    <input type="radio" name="rating" id="star-4" value="4">
+                                    <label for="star-4" title="4 Bintang">★</label>
+                                    <input type="radio" name="rating" id="star-3" value="3">
+                                    <label for="star-3" title="3 Bintang">★</label>
+                                    <input type="radio" name="rating" id="star-2" value="2">
+                                    <label for="star-2" title="2 Bintang">★</label>
+                                    <input type="radio" name="rating" id="star-1" value="1">
+                                    <label for="star-1" title="1 Bintang">★</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="commentText" placeholder="Tulis komentar atau saran Anda di sini..." rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-comment-btn">
+                            <span>Kirim Ulasan</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Comments List -->
+                <div class="comments-list" id="commentsList">
+                    <!-- Dynamic comments will be inserted here by script.js -->
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -415,8 +493,8 @@
                         <path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                         <defs>
                             <linearGradient id="logoGrad2" x1="0" y1="0" x2="32" y2="32">
-                                <stop stop-color="#6366f1"/>
-                                <stop offset="1" stop-color="#a855f7"/>
+                                <stop stop-color="#00f0ff"/>
+                                <stop offset="1" stop-color="#3b82f6"/>
                             </linearGradient>
                         </defs>
                     </svg>
