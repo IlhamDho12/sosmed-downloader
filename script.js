@@ -168,12 +168,25 @@
         resultTitle.textContent = data.title || 'Media dari Sosial Media';
         resultMeta.textContent = data.meta || '';
 
-        // Set thumbnail
+        // Set thumbnail safely to prevent DOM XSS
         if (data.thumb) {
-            resultThumb.innerHTML = `<img src="${data.thumb}" alt="Thumbnail" onerror="this.parentElement.innerHTML='<svg viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'1.5\\'><rect x=\\'2\\' y=\\'2\\' width=\\'20\\' height=\\'20\\' rx=\\'4\\'/><polygon points=\\'10 8 16 12 10 16 10 8\\'/></svg>'">`;
+            resultThumb.innerHTML = '';
+            const img = document.createElement('img');
+            img.alt = 'Thumbnail';
+            img.src = data.thumb;
+            img.onerror = () => {
+                resultThumb.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>`;
+            };
+            resultThumb.appendChild(img);
         }
 
-        resultDownloadLink.href = data.url;
+        // Validate URL schema to prevent javascript: or data: URI injection
+        const downloadUrl = data.url || '#';
+        if (downloadUrl.startsWith('http://') || downloadUrl.startsWith('https://') || downloadUrl.startsWith('blob:')) {
+            resultDownloadLink.href = downloadUrl;
+        } else {
+            resultDownloadLink.href = '#';
+        }
         resultDownloadLink.setAttribute('download', '');
 
         // Show mobile tips if on mobile device
@@ -699,8 +712,13 @@
             const card = document.createElement('div');
             card.className = 'comment-card';
 
-            // Get initials for avatar
-            const initials = comment.name ? comment.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+            // Get initials for avatar and sanitize to alphanumeric only to prevent HTML markup breakage
+            let initials = 'U';
+            if (comment.name) {
+                const parts = comment.name.trim().split(/\s+/);
+                const rawInitials = parts.map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                initials = rawInitials.replace(/[^A-Z0-9]/g, '') || 'U';
+            }
 
             // Generate stars HTML
             let starsHtml = '';
