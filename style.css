@@ -1053,36 +1053,62 @@ select {
 .quick-chip {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    border-radius: 50%;
     color: var(--text-secondary);
     transition: var(--transition);
 }
 
-.quick-chip:hover {
-    border-color: var(--border-hover);
-    color: var(--text-primary);
-    transform: translateY(-1px);
+.quick-chip svg {
+    width: 20px;
+    height: 20px;
+    transition: var(--transition);
 }
 
-.chip-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    display: inline-block;
+/* Hover glowing effects tailored for each platform */
+.quick-chip.youtube:hover {
+    color: #ff4444;
+    border-color: rgba(255, 68, 68, 0.5);
+    background: rgba(255, 68, 68, 0.05);
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.2);
+    transform: translateY(-2px);
 }
 
-.quick-chip.youtube .chip-dot { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
-.quick-chip.tiktok .chip-dot { background: #ffffff; box-shadow: 0 0 8px #ffffff; }
-.quick-chip.instagram .chip-dot { background: #e1306c; box-shadow: 0 0 8px #e1306c; }
-.quick-chip.twitter .chip-dot { background: #1da1f2; box-shadow: 0 0 8px #1da1f2; }
-.quick-chip.facebook .chip-dot { background: #1877f2; box-shadow: 0 0 8px #1877f2; }
-.quick-chip.reddit .chip-dot { background: #ff4500; box-shadow: 0 0 8px #ff4500; }
+.quick-chip.tiktok:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.quick-chip.instagram:hover {
+    color: #e1306c;
+    border-color: rgba(225, 48, 108, 0.5);
+    background: rgba(225, 48, 108, 0.05);
+    box-shadow: 0 0 15px rgba(225, 48, 108, 0.2);
+    transform: translateY(-2px);
+}
+
+.quick-chip.twitter:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.quick-chip.facebook:hover {
+    color: #1877f2;
+    border-color: rgba(24, 119, 242, 0.5);
+    background: rgba(24, 119, 242, 0.05);
+    box-shadow: 0 0 15px rgba(24, 119, 242, 0.2);
+    transform: translateY(-2px);
+}
 
 /* === Comments Section === */
 .comments {
@@ -1398,8 +1424,13 @@ select {
     }
 
     .quick-chip {
-        padding: 5px 10px;
-        font-size: 0.7rem;
+        width: 36px;
+        height: 36px;
+    }
+
+    .quick-chip svg {
+        width: 16px;
+        height: 16px;
     }
 
     .features-grid {

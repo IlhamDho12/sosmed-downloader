@@ -87,13 +87,7 @@
                 /fb\.watch/,
                 /fb\.com/,
             ],
-        },
-        reddit: {
-            name: 'Reddit',
-            patterns: [
-                /reddit\.com/,
-            ],
-        },
+        }
     };
 
     // === Utility Functions ===
@@ -254,7 +248,7 @@
 
         const platform = detectPlatform(url.trim());
         if (!platform) {
-            showStatus('Platform tidak didukung. Coba link dari YouTube, TikTok, Instagram, Twitter, Facebook, atau Reddit.', 'error');
+            showStatus('Platform tidak didukung. Coba link dari YouTube, TikTok, Instagram, Twitter, atau Facebook.', 'error');
             return;
         }
 
