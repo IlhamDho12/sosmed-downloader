@@ -688,64 +688,54 @@
         }
     ];
 
-    // === Firebase Configuration ===
-    const firebaseConfig = {
-        apiKey: "AIzaSyBJCRphhOTiLuK8_5HF1F_co9CJrBxGNGs",
-        authDomain: "ilhamdho-downloader.firebaseapp.com",
-        projectId: "ilhamdho-downloader",
-        storageBucket: "ilhamdho-downloader.firebasestorage.app",
-        messagingSenderId: "34351450168",
-        appId: "1:34351450168:web:5bc5638cf8a38596b51bcd",
-        measurementId: "G-VVXJL3HD51"
-    };
-
-    // Initialize Firebase
-    let db = null;
-    try {
-        if (typeof firebase !== 'undefined') {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            console.log('🔥 Firebase Firestore initialized successfully');
-        }
-    } catch (error) {
-        console.error('Firebase initialization failed:', error);
-    }
+    // === Google Sheets Database Configuration ===
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMGo-nk0uGzBU18z6d9iq93vqpY2gUb3EeXjSNS_fPu5WJPzpA-8vagakxZZ-lt_fR/exec";
 
     let comments = [];
 
     // Load default comments initially
     comments = [...defaultComments];
 
-    if (db) {
-        // Load comments in real-time from Firestore!
+    async function fetchComments() {
         try {
-            db.collection('comments')
-                .orderBy('date', 'desc')
-                .onSnapshot((snapshot) => {
-                    const fetchedComments = [];
-                    snapshot.forEach((doc) => {
-                        fetchedComments.push(doc.data());
-                    });
+            const res = await fetch(GOOGLE_SCRIPT_URL);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            
+            // Map Google Sheets data to our comment format
+            // data format: [{id, name, category, comment, timestamp, reply, repliedBy}]
+            comments = data.reverse().map(item => {
+                // Map category to rating stars
+                let rating = 5;
+                if (item.category === 'suggestion') rating = 4;
+                if (item.category === 'bug') rating = 3;
 
-                    if (fetchedComments.length > 0) {
-                        comments = fetchedComments;
-                        renderComments();
-                    } else {
-                        // Seed database with default comments if empty
-                        defaultComments.forEach((c) => {
-                            db.collection('comments').add(c);
-                        });
+                // Format timestamp
+                let dateStr = '';
+                if (item.timestamp) {
+                    try {
+                        const d = new Date(item.timestamp);
+                        dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                    } catch {
+                        dateStr = item.timestamp;
                     }
-                }, (error) => {
-                    console.warn('Firestore snapshot error, fallback to local storage:', error);
-                    loadLocalComments();
-                });
+                }
+
+                return {
+                    id: item.id || Math.random().toString(36).substr(2, 9),
+                    name: item.name || 'Anonim',
+                    rating: rating,
+                    text: item.comment || '',
+                    date: dateStr,
+                    reply: item.reply || '',
+                    repliedBy: item.repliedBy || ''
+                };
+            });
+            renderComments();
         } catch (err) {
-            console.warn('Firestore subscription failed, fallback to local storage:', err);
+            console.error("Gagal memuat ulasan online, menggunakan data lokal:", err);
             loadLocalComments();
         }
-    } else {
-        loadLocalComments();
     }
 
     function loadLocalComments() {
@@ -787,6 +777,19 @@
                 starsHtml += i <= comment.rating ? '★' : '☆';
             }
 
+            let replyHtml = '';
+            if (comment.reply) {
+                replyHtml = `
+                    <div class="comment-reply">
+                        <div class="reply-header">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="reply-icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <span>${comment.repliedBy || 'Developer'}</span>
+                        </div>
+                        <p class="reply-body">${escapeHTML(comment.reply)}</p>
+                    </div>
+                `;
+            }
+
             card.innerHTML = `
                 <div class="comment-avatar">${initials}</div>
                 <div class="comment-content">
@@ -798,6 +801,7 @@
                         </div>
                     </div>
                     <p class="comment-body">${escapeHTML(comment.text)}</p>
+                    ${replyHtml}
                 </div>
             `;
             commentsList.appendChild(card);
@@ -820,7 +824,7 @@
 
     // Submit comment form handler
     if (commentForm) {
-        commentForm.addEventListener('submit', (e) => {
+        commentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const nameVal = commentName.value.trim();
@@ -836,28 +840,68 @@
             const now = new Date();
             const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
+            // Build the exact payload format Google Sheets expects
             const newComment = {
+                id: Math.random().toString(36).substr(2, 9),
                 name: nameVal,
-                rating: ratingVal,
-                text: textVal,
-                date: dateStr
+                category: ratingVal === 5 ? 'general' : (ratingVal === 4 ? 'suggestion' : 'bug'),
+                comment: textVal,
+                timestamp: new Date().toISOString(),
+                reply: '',
+                repliedBy: ''
             };
 
-            if (db) {
-                // Save to Firestore (Realtime listener will automatically update the UI!)
-                db.collection('comments').add(newComment)
-                    .then(() => {
-                        commentForm.reset();
-                        const star5 = document.getElementById('star-5');
-                        if (star5) star5.checked = true;
-                        showStatus('Komentar Anda berhasil dipublikasikan secara online! Terima kasih.', 'success');
-                    })
-                    .catch((err) => {
-                        console.error('Error writing to Firestore, saving locally:', err);
-                        saveCommentLocally(newComment);
-                    });
-            } else {
-                saveCommentLocally(newComment);
+            // Set loading state / disable submit button
+            const submitBtn = commentForm.querySelector('.submit-comment-btn');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Mengirim...</span>';
+
+            try {
+                // Post to Google Sheets (no-cors mode)
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newComment)
+                });
+
+                // Optimistically prepend to comments list and save locally too
+                comments.unshift({
+                    id: newComment.id,
+                    name: newComment.name,
+                    rating: ratingVal,
+                    text: newComment.comment,
+                    date: dateStr,
+                    reply: '',
+                    repliedBy: ''
+                });
+                renderComments();
+
+                // Save locally
+                try {
+                    localStorage.setItem('ilhamdhosaver_comments', JSON.stringify(comments));
+                } catch (err) {
+                    console.warn(err);
+                }
+
+                // Reset form
+                commentForm.reset();
+                const star5 = document.getElementById('star-5');
+                if (star5) star5.checked = true;
+
+                showStatus('Komentar Anda berhasil dipublikasikan secara online! Terima kasih.', 'success');
+            } catch (err) {
+                console.error("Gagal mengirim ulasan online, menyimpan secara lokal:", err);
+                saveCommentLocally({
+                    name: nameVal,
+                    rating: ratingVal,
+                    text: textVal,
+                    date: dateStr
+                });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             }
         });
     }
@@ -875,6 +919,9 @@
         if (star5) star5.checked = true;
         showStatus('Komentar Anda berhasil dipublikasikan! Terima kasih.', 'success');
     }
+
+    // Load initial comments from Sheets
+    fetchComments();
 
     // === Keyboard Accessibility ===
     urlInput.setAttribute('aria-label', 'Masukkan URL video dari sosial media');
