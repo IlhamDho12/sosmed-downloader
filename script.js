@@ -688,19 +688,80 @@
         }
     ];
 
-    // Load comments from localStorage or fallback to default
-    let comments = [];
+    // === Firebase Configuration ===
+    const firebaseConfig = {
+        apiKey: "AIzaSyBJCRphhOTiLuK8_5HF1F_co9CJrBxGNGs",
+        authDomain: "ilhamdho-downloader.firebaseapp.com",
+        projectId: "ilhamdho-downloader",
+        storageBucket: "ilhamdho-downloader.firebasestorage.app",
+        messagingSenderId: "34351450168",
+        appId: "1:34351450168:web:5bc5638cf8a38596b51bcd",
+        measurementId: "G-VVXJL3HD51"
+    };
+
+    // Initialize Firebase
+    let db = null;
     try {
-        const stored = localStorage.getItem('ilhamdhosaver_comments');
-        if (stored) {
-            comments = JSON.parse(stored);
-        } else {
-            comments = [...defaultComments];
-            localStorage.setItem('ilhamdhosaver_comments', JSON.stringify(comments));
+        if (typeof firebase !== 'undefined') {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log('🔥 Firebase Firestore initialized successfully');
         }
-    } catch (e) {
-        console.warn('Failed to load comments from localStorage, using defaults.', e);
-        comments = [...defaultComments];
+    } catch (error) {
+        console.error('Firebase initialization failed:', error);
+    }
+
+    let comments = [];
+
+    // Load default comments initially
+    comments = [...defaultComments];
+
+    if (db) {
+        // Load comments in real-time from Firestore!
+        try {
+            db.collection('comments')
+                .orderBy('date', 'desc')
+                .onSnapshot((snapshot) => {
+                    const fetchedComments = [];
+                    snapshot.forEach((doc) => {
+                        fetchedComments.push(doc.data());
+                    });
+
+                    if (fetchedComments.length > 0) {
+                        comments = fetchedComments;
+                        renderComments();
+                    } else {
+                        // Seed database with default comments if empty
+                        defaultComments.forEach((c) => {
+                            db.collection('comments').add(c);
+                        });
+                    }
+                }, (error) => {
+                    console.warn('Firestore snapshot error, fallback to local storage:', error);
+                    loadLocalComments();
+                });
+        } catch (err) {
+            console.warn('Firestore subscription failed, fallback to local storage:', err);
+            loadLocalComments();
+        }
+    } else {
+        loadLocalComments();
+    }
+
+    function loadLocalComments() {
+        try {
+            const stored = localStorage.getItem('ilhamdhosaver_comments');
+            if (stored) {
+                comments = JSON.parse(stored);
+            } else {
+                comments = [...defaultComments];
+                localStorage.setItem('ilhamdhosaver_comments', JSON.stringify(comments));
+            }
+        } catch (e) {
+            console.warn('Failed to load comments from localStorage:', e);
+            comments = [...defaultComments];
+        }
+        renderComments();
     }
 
     // Function to render comments
@@ -782,31 +843,38 @@
                 date: dateStr
             };
 
-            // Prepend new comment to list
-            comments.unshift(newComment);
-
-            // Save to localStorage
-            try {
-                localStorage.setItem('ilhamdhosaver_comments', JSON.stringify(comments));
-            } catch (err) {
-                console.error('Failed to save comment to localStorage', err);
+            if (db) {
+                // Save to Firestore (Realtime listener will automatically update the UI!)
+                db.collection('comments').add(newComment)
+                    .then(() => {
+                        commentForm.reset();
+                        const star5 = document.getElementById('star-5');
+                        if (star5) star5.checked = true;
+                        showStatus('Komentar Anda berhasil dipublikasikan secara online! Terima kasih.', 'success');
+                    })
+                    .catch((err) => {
+                        console.error('Error writing to Firestore, saving locally:', err);
+                        saveCommentLocally(newComment);
+                    });
+            } else {
+                saveCommentLocally(newComment);
             }
-
-            // Render and reset form
-            renderComments();
-            commentForm.reset();
-
-            // Reset stars rating to 5
-            const star5 = document.getElementById('star-5');
-            if (star5) star5.checked = true;
-
-            // Show confirmation toast/status
-            showStatus('Komentar Anda berhasil dipublikasikan! Terima kasih.', 'success');
         });
     }
 
-    // Render initial comments
-    renderComments();
+    function saveCommentLocally(comment) {
+        comments.unshift(comment);
+        try {
+            localStorage.setItem('ilhamdhosaver_comments', JSON.stringify(comments));
+        } catch (err) {
+            console.error('Failed to save comment to localStorage', err);
+        }
+        renderComments();
+        commentForm.reset();
+        const star5 = document.getElementById('star-5');
+        if (star5) star5.checked = true;
+        showStatus('Komentar Anda berhasil dipublikasikan! Terima kasih.', 'success');
+    }
 
     // === Keyboard Accessibility ===
     urlInput.setAttribute('aria-label', 'Masukkan URL video dari sosial media');
