@@ -1463,6 +1463,11 @@ select {
         flex-direction: column;
         text-align: center;
     }
+
+    .comment-reminder-hint {
+        margin-top: 12px;
+        font-size: 0.75rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1473,4 +1478,26 @@ select {
     .platform-card {
         padding: 16px 10px;
     }
+}
+
+/* === Comment Reminder Hint (Static) === */
+.comment-reminder-hint {
+    margin-top: 20px;
+    font-size: 0.825rem;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.4;
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.comment-reminder-hint a {
+    color: var(--accent-indigo);
+    font-weight: 600;
+    text-decoration: underline;
+    transition: var(--transition);
+}
+
+.comment-reminder-hint a:hover {
+    color: var(--text-primary);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }

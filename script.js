@@ -561,6 +561,14 @@
             // Show comment reminder status
             showStatus('Unduhan selesai! Suka dengan IlhamdhoSaver? Jangan lupa berikan rating & komentar Anda di kolom ulasan di bawah ya! ❤️', 'success');
 
+            // Automatically scroll to comments section after a short delay
+            setTimeout(() => {
+                const target = document.getElementById('comments');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 1200);
+
             // Clean up blob URL after a short delay
             setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 
@@ -573,6 +581,14 @@
 
             // Show comment reminder status for fallback download
             showStatus('Memulai unduhan... Suka dengan IlhamdhoSaver? Tolong berikan ulasan & komentar Anda di kolom di bawah ya! ❤️', 'success');
+
+            // Automatically scroll to comments section after a short delay
+            setTimeout(() => {
+                const target = document.getElementById('comments');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 1200);
 
             // Fallback: Open in the same window (direct fallback)
             window.location.href = downloadUrl;
