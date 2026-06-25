@@ -302,7 +302,7 @@
                         url: downloadUrl,
                     });
 
-                    showStatus('Berhasil! Klik tombol "Simpan File" untuk download.', 'success');
+                    showStatus('Berhasil! Klik tombol "Simpan File" di bawah. Suka dengan IlhamdhoSaver? Tolong berikan rating & komentar di bawah ya! ⭐', 'success');
                     setLoading(false);
                     return;
 
@@ -317,7 +317,7 @@
                             thumb: firstPick.thumb || data.picker?.[0]?.thumb || null,
                             url: firstPick.url,
                         });
-                        showStatus('Berhasil! Klik tombol "Simpan File" untuk download.', 'success');
+                        showStatus('Berhasil! Klik tombol "Simpan File" di bawah. Suka dengan IlhamdhoSaver? Tolong berikan rating & komentar di bawah ya! ⭐', 'success');
                         setLoading(false);
                         return;
                     } else {
@@ -558,6 +558,9 @@
             resultDownloadLink.style.pointerEvents = 'auto';
             resultDownloadLink.style.opacity = '1';
 
+            // Show comment reminder status
+            showStatus('Unduhan selesai! Suka dengan IlhamdhoSaver? Jangan lupa berikan rating & komentar Anda di kolom ulasan di bawah ya! ❤️', 'success');
+
             // Clean up blob URL after a short delay
             setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 
@@ -567,6 +570,9 @@
             resultDownloadLink.innerHTML = originalContent;
             resultDownloadLink.style.pointerEvents = 'auto';
             resultDownloadLink.style.opacity = '1';
+
+            // Show comment reminder status for fallback download
+            showStatus('Memulai unduhan... Suka dengan IlhamdhoSaver? Tolong berikan ulasan & komentar Anda di kolom di bawah ya! ❤️', 'success');
 
             // Fallback: Open in the same window (direct fallback)
             window.location.href = downloadUrl;
