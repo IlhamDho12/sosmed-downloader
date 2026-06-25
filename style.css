@@ -1532,3 +1532,17 @@ select {
     color: var(--text-primary);
     text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
+
+/* === Full-Page Screenshot & Print Optimization === */
+@media print {
+    .bg-animation {
+        display: none !important;
+    }
+    .navbar {
+        position: absolute !important;
+    }
+    body {
+        background: #07080a !important;
+        color: #f0f3f6 !important;
+    }
+}
