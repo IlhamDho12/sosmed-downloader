@@ -6,11 +6,12 @@
     <title>IlhamdhoSaver — Download Video & Audio dari Sosial Media</title>
     <meta name="description" content="Download video dan audio dari YouTube, TikTok, Instagram, Twitter, Facebook dan platform sosial media lainnya. 100% Gratis, cepat, tanpa iklan.">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#04261D">
+    <meta name="theme-color" content="#F5F7F5">
     <link rel="canonical" href="https://sosmed-downloader-ruddy.vercel.app/">
 
     <!-- Favicon (Inline SVG for instant load) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='url(%23g)'/><path d='M10 16L15 21L22 11' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/><defs><linearGradient id='g' x1='0' y1='0' x2='32' y2='32'><stop stop-color='%23059669'/><stop offset='0.5' stop-color='%23ce1126'/><stop offset='1' stop-color='%23eab308'/></linearGradient></defs></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%235A6E5A'/><path d='M10 16L15 21L22 11' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -29,37 +30,26 @@
     <!-- Preconnect Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
+    <!-- Three.js & Vanta.js 3D Background Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
 
     <!-- Vercel Web Analytics & Speed Insights -->
     <script defer src="//_vercel/insights/script.js"></script>
     <script defer src="//_vercel/speed-insights/script.js"></script>
 </head>
 <body>
-    <!-- Animated background -->
-    <div class="bg-animation">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="orb orb-4"></div>
-    </div>
+    <!-- 3D Vanta Background Canvas -->
+    <div id="vanta-bg" class="vanta-container"></div>
 
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#" class="nav-logo">
-                <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
-                    <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
-                    <path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <defs>
-                        <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
-                            <stop stop-color="#059669"/>
-                            <stop offset="0.5" stop-color="#ce1126"/>
-                            <stop offset="1" stop-color="#eab308"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#5A6E5A"/><path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span>IlhamdhoSaver</span>
             </a>
             <div class="nav-links">
@@ -295,7 +285,7 @@
                 </div>
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #00f0ff;">
+                        <div class="feature-icon" style="--accent: #5A6E5A;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"/>
                                 <polyline points="12 6 12 12 16 14"/>
@@ -305,7 +295,7 @@
                         <p>Proses download hanya dalam hitungan detik. Server kami dioptimasi untuk kecepatan maksimal.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #3b82f6;">
+                        <div class="feature-icon" style="--accent: #5A6E5A;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                             </svg>
@@ -314,7 +304,7 @@
                         <p>Tidak ada data yang disimpan. Semua proses berjalan aman tanpa tracking atau cookies.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #10b981;">
+                        <div class="feature-icon" style="--accent: #5A6E5A;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
                                 <line x1="4" y1="22" x2="4" y2="15"/>
@@ -324,7 +314,7 @@
                         <p>Tanpa biaya, tanpa langganan, tanpa batasan. Semua fitur bisa digunakan gratis sepenuhnya.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #00ffaa;">
+                        <div class="feature-icon" style="--accent: #5A6E5A;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
                                 <line x1="8" y1="21" x2="16" y2="21"/>
@@ -335,7 +325,7 @@
                         <p>Download dalam format video (MP4) atau audio (MP3) dengan berbagai kualitas yang tersedia.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon" style="--accent: #0ea5e9;">
+                        <div class="feature-icon" style="--accent: #5A6E5A;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                                 <circle cx="9" cy="7" r="4"/>
@@ -364,10 +354,12 @@
                         <p>Salin URL video dari aplikasi sosial media yang kamu gunakan.</p>
                     </div>
                     <div class="step-connector">
-                        <svg viewBox="0 0 40 24" fill="none">
-                            <path d="M0 12h36M30 6l6 6-6 6" stroke="url(#connGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <defs><linearGradient id="connGrad" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#00f0ff"/></linearGradient></defs>
-                        </svg>
+                        <div class="connector-arrow" title="Langkah Selanjutnya">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </div>
                     </div>
                     <div class="step-card">
                         <div class="step-number">2</div>
@@ -375,10 +367,12 @@
                         <p>Paste link di kolom di atas, lalu pilih format video atau audio.</p>
                     </div>
                     <div class="step-connector">
-                        <svg viewBox="0 0 40 24" fill="none">
-                            <path d="M0 12h36M30 6l6 6-6 6" stroke="url(#connGrad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <defs><linearGradient id="connGrad2" x1="0" y1="12" x2="40" y2="12"><stop stop-color="#00f0ff"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
-                        </svg>
+                        <div class="connector-arrow" title="Langkah Selanjutnya">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </div>
                     </div>
                     <div class="step-card">
                         <div class="step-number">3</div>
@@ -451,16 +445,7 @@
         <div class="footer-container">
             <div class="footer-brand">
                 <a href="#" class="nav-logo">
-                    <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
-                        <rect width="32" height="32" rx="8" fill="url(#logoGrad2)"/>
-                        <path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <defs>
-                            <linearGradient id="logoGrad2" x1="0" y1="0" x2="32" y2="32">
-                                <stop stop-color="#00f0ff"/>
-                                <stop offset="1" stop-color="#3b82f6"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                    <svg class="logo-icon" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#5A6E5A"/><path d="M10 16L15 21L22 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span>IlhamdhoSaver</span>
                 </a>
                 <p class="footer-desc">Download video dan audio dari platform sosial media favoritmu. Gratis, cepat, dan aman.</p>

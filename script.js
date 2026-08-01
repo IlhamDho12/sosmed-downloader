@@ -6,6 +6,322 @@
 (function () {
     'use strict';
 
+    // ============================================================
+    // === Option 3: 3D Interactive Social Media & Downloader Scene ===
+    // (Three.js WebGL Engine: 3D Floating Download Arrows, 3D Play Buttons,
+    //  3D Link Rings, 3D Clouds, and Media Orbs with Mouse/Touch Physics)
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('vanta-bg');
+        if (!container || typeof THREE === 'undefined') return;
+
+        // Scene, Camera, Renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 24;
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        // Enhanced 3D Lighting for Crisp 3D Depth
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        scene.add(ambientLight);
+
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.4);
+        dirLight1.position.set(30, 40, 30);
+        scene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0xa3b5a3, 0.8);
+        dirLight2.position.set(-30, -40, -15);
+        scene.add(dirLight2);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
+        pointLight.position.set(0, 0, 20);
+        scene.add(pointLight);
+
+        // High-Contrast Vibrant Materials
+        const matSageDark = new THREE.MeshStandardMaterial({ color: 0x2D4C32, roughness: 0.2, metalness: 0.3 });
+        const matSageLight = new THREE.MeshStandardMaterial({ color: 0x4A6E50, roughness: 0.3, metalness: 0.2 });
+        const matWhite = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.1, metalness: 0.1 });
+        const matAmber = new THREE.MeshStandardMaterial({ color: 0xE8BA48, roughness: 0.2, metalness: 0.4 });
+        const matRedYT = new THREE.MeshStandardMaterial({ color: 0xE62117, roughness: 0.2, metalness: 0.2 });
+        const matBlueFB = new THREE.MeshStandardMaterial({ color: 0x1877F2, roughness: 0.2, metalness: 0.2 });
+        const matDarkX = new THREE.MeshStandardMaterial({ color: 0x0F1419, roughness: 0.15, metalness: 0.5 });
+        const matPinkInsta = new THREE.MeshStandardMaterial({ color: 0xE1306C, roughness: 0.2, metalness: 0.3 });
+        const matCyanTT = new THREE.MeshStandardMaterial({ color: 0x25F4EE, roughness: 0.2, metalness: 0.3 });
+
+        const objects = [];
+
+        // Helper: Create 3D Download Arrow (Enlarged & Bold)
+        function create3DDownloadArrow(scale = 2.0, mat = matSageDark) {
+            const group = new THREE.Group();
+            const shaftGeo = new THREE.CylinderGeometry(0.3 * scale, 0.3 * scale, 1.5 * scale, 16);
+            const shaft = new THREE.Mesh(shaftGeo, mat);
+            shaft.position.y = 0.45 * scale;
+            group.add(shaft);
+
+            const headGeo = new THREE.ConeGeometry(0.85 * scale, 1.0 * scale, 16);
+            const head = new THREE.Mesh(headGeo, mat);
+            head.position.y = -0.65 * scale;
+            head.rotation.x = Math.PI;
+            group.add(head);
+
+            const barGeo = new THREE.BoxGeometry(1.8 * scale, 0.3 * scale, 0.35 * scale);
+            const bar = new THREE.Mesh(barGeo, mat);
+            bar.position.y = -1.45 * scale;
+            group.add(bar);
+            return group;
+        }
+
+        // Helper: Create 3D YouTube Logo (Enlarged 3D Badge)
+        function create3DYouTubeLogo(scale = 2.2) {
+            const group = new THREE.Group();
+            const boxGeo = new THREE.BoxGeometry(2.2 * scale, 1.5 * scale, 0.4 * scale);
+            const box = new THREE.Mesh(boxGeo, matRedYT);
+            group.add(box);
+
+            const triGeo = new THREE.ConeGeometry(0.5 * scale, 0.75 * scale, 3);
+            const tri = new THREE.Mesh(triGeo, matWhite);
+            tri.rotation.z = -Math.PI / 2;
+            tri.position.z = 0.25 * scale;
+            group.add(tri);
+            return group;
+        }
+
+        // Helper: Create 3D TikTok Logo (Enlarged 3D Note)
+        function create3DTikTokLogo(scale = 2.0) {
+            const group = new THREE.Group();
+            const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.16 * scale, 0.16 * scale, 1.6 * scale, 16), matDarkX);
+            stem.position.set(0.12 * scale, 0.25 * scale, 0);
+            group.add(stem);
+
+            const bulb = new THREE.Mesh(new THREE.TorusGeometry(0.45 * scale, 0.16 * scale, 12, 24), matCyanTT);
+            bulb.position.set(-0.3 * scale, -0.5 * scale, 0);
+            group.add(bulb);
+
+            const hook = new THREE.Mesh(new THREE.TorusGeometry(0.5 * scale, 0.16 * scale, 12, 24, Math.PI / 2), matPinkInsta);
+            hook.position.set(0.62 * scale, 0.62 * scale, 0);
+            hook.rotation.z = -Math.PI / 2;
+            group.add(hook);
+            return group;
+        }
+
+        // Helper: Create 3D X (Twitter) Logo (Enlarged 3D 'X')
+        function create3DXLogo(scale = 2.0) {
+            const group = new THREE.Group();
+            const bar1 = new THREE.Mesh(new THREE.BoxGeometry(0.35 * scale, 2.2 * scale, 0.35 * scale), matDarkX);
+            bar1.rotation.z = Math.PI / 4;
+            group.add(bar1);
+
+            const bar2 = new THREE.Mesh(new THREE.BoxGeometry(0.35 * scale, 2.2 * scale, 0.35 * scale), matDarkX);
+            bar2.rotation.z = -Math.PI / 4;
+            group.add(bar2);
+            return group;
+        }
+
+        // Helper: Create 3D Facebook Logo (Enlarged 3D 'f' Badge)
+        function create3DFacebookLogo(scale = 2.0) {
+            const group = new THREE.Group();
+            const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.1 * scale, 1.1 * scale, 0.35 * scale, 32), matBlueFB);
+            disc.rotation.x = Math.PI / 2;
+            group.add(disc);
+
+            const fVert = new THREE.Mesh(new THREE.BoxGeometry(0.28 * scale, 1.4 * scale, 0.4 * scale), matWhite);
+            fVert.position.set(0.2 * scale, -0.05 * scale, 0.08 * scale);
+            group.add(fVert);
+
+            const fBar = new THREE.Mesh(new THREE.BoxGeometry(0.65 * scale, 0.28 * scale, 0.4 * scale), matWhite);
+            fBar.position.set(0.12 * scale, 0.2 * scale, 0.08 * scale);
+            group.add(fBar);
+            return group;
+        }
+
+        // Helper: Create 3D Instagram Logo (Enlarged 3D Lens Badge)
+        function create3DInstagramLogo(scale = 2.0) {
+            const group = new THREE.Group();
+            const outer = new THREE.Mesh(new THREE.TorusGeometry(0.9 * scale, 0.2 * scale, 16, 32), matPinkInsta);
+            group.add(outer);
+
+            const lens = new THREE.Mesh(new THREE.TorusGeometry(0.42 * scale, 0.12 * scale, 16, 24), matWhite);
+            group.add(lens);
+
+            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.14 * scale, 12, 12), matAmber);
+            dot.position.set(0.5 * scale, 0.5 * scale, 0);
+            group.add(dot);
+            return group;
+        }
+
+        // Helper: Create 3D Play Button
+        function create3DPlayButton(scale = 2.0, mat = matWhite) {
+            const group = new THREE.Group();
+            const boxGeo = new THREE.BoxGeometry(2.0 * scale, 1.7 * scale, 0.4 * scale);
+            const box = new THREE.Mesh(boxGeo, matSageDark);
+            group.add(box);
+
+            const triGeo = new THREE.ConeGeometry(0.65 * scale, 0.9 * scale, 3);
+            const tri = new THREE.Mesh(triGeo, mat);
+            tri.rotation.z = -Math.PI / 2;
+            tri.position.z = 0.25 * scale;
+            group.add(tri);
+            return group;
+        }
+
+        // Helper: Create 3D Link Chain Rings
+        function create3DLinkRings(scale = 2.0) {
+            const group = new THREE.Group();
+            const ringGeo = new THREE.TorusGeometry(0.9 * scale, 0.25 * scale, 16, 32);
+            const r1 = new THREE.Mesh(ringGeo, matSageLight);
+            r1.position.x = -0.55 * scale;
+            group.add(r1);
+
+            const r2 = new THREE.Mesh(ringGeo, matWhite);
+            r2.position.x = 0.55 * scale;
+            r2.rotation.y = Math.PI / 2;
+            group.add(r2);
+            return group;
+        }
+
+        // Helper: Create 3D Cloud
+        function create3DCloud(scale = 2.0) {
+            const group = new THREE.Group();
+            const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.9 * scale, 16, 16), matWhite);
+            const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.65 * scale, 16, 16), matWhite);
+            s2.position.set(-0.75 * scale, -0.15 * scale, 0);
+            const s3 = new THREE.Mesh(new THREE.SphereGeometry(0.7 * scale, 16, 16), matWhite);
+            s3.position.set(0.75 * scale, -0.15 * scale, 0);
+            const s4 = new THREE.Mesh(new THREE.SphereGeometry(0.55 * scale, 16, 16), matSageLight);
+            s4.position.set(0, 0.5 * scale, 0);
+            group.add(s1, s2, s3, s4);
+            return group;
+        }
+
+        // SPAWN 3D MODELS SPREAD ACROSS THE ENTIRE SCREEN (Left, Right, Top, Bottom, Corners, & Deep Space)
+        const spawnList = [
+            // Top Section (Left, Center, Right)
+            { fn: () => create3DYouTubeLogo(2.2), pos: [-18, 14, 2] },
+            { fn: () => create3DInstagramLogo(2.0), pos: [0, 16, -1] },
+            { fn: () => create3DTikTokLogo(2.1), pos: [18, 14, 3] },
+
+            // Upper Mid Section (Far Left & Far Right)
+            { fn: () => create3DDownloadArrow(2.2, matSageDark), pos: [-22, 7, 4] },
+            { fn: () => create3DFacebookLogo(2.1), pos: [22, 7, 1] },
+
+            // Center Sides (Left & Right of main download box)
+            { fn: () => create3DXLogo(2.1), pos: [-15, 1, 3] },
+            { fn: () => create3DYouTubeLogo(2.0), pos: [15, 1, 2] },
+
+            // Lower Mid Section (Far Left & Far Right)
+            { fn: () => create3DPlayButton(2.0, matWhite), pos: [-20, -7, 2] },
+            { fn: () => create3DLinkRings(2.1), pos: [20, -7, 4] },
+
+            // Bottom Section (Left, Center, Right)
+            { fn: () => create3DInstagramLogo(2.1), pos: [-16, -15, 1] },
+            { fn: () => create3DCloud(2.2), pos: [0, -16, -2] },
+            { fn: () => create3DTikTokLogo(2.0), pos: [16, -15, 3] },
+
+            // Deep Background Accent Models (Spreading Across Full Viewport)
+            { fn: () => create3DDownloadArrow(1.8, matAmber), pos: [10, 12, -5] },
+            { fn: () => create3DFacebookLogo(1.8), pos: [-12, 12, -4] },
+            { fn: () => create3DXLogo(1.8), pos: [12, -12, -5] },
+            { fn: () => create3DDownloadArrow(1.8, matSageLight), pos: [-12, -12, -4] }
+        ];
+
+        // Floating 3D media spheres / rings filling outer space
+        for (let i = 0; i < 16; i++) {
+            const size = 0.5 + Math.random() * 0.6;
+            const geo = (i % 2 === 0) 
+                ? new THREE.SphereGeometry(size, 16, 16) 
+                : new THREE.TorusGeometry(size, size * 0.35, 12, 24);
+            const mat = (i % 4 === 0) ? matSageDark : (i % 4 === 1 ? matSageLight : (i % 4 === 2 ? matAmber : matWhite));
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(
+                (Math.random() - 0.5) * 44,
+                (Math.random() - 0.5) * 36,
+                (Math.random() - 0.5) * 14 - 3
+            );
+            objects.push({
+                mesh,
+                baseX: mesh.position.x,
+                baseY: mesh.position.y,
+                rotX: (Math.random() - 0.5) * 0.025,
+                rotY: (Math.random() - 0.5) * 0.025,
+                rotZ: (Math.random() - 0.5) * 0.015,
+                speed: 0.001 + Math.random() * 0.002,
+                offset: Math.random() * Math.PI * 2
+            });
+            scene.add(mesh);
+        }
+
+        spawnList.forEach(item => {
+            const mesh = item.fn();
+            mesh.position.set(...item.pos);
+            scene.add(mesh);
+            objects.push({
+                mesh,
+                baseX: item.pos[0],
+                baseY: item.pos[1],
+                rotX: (Math.random() - 0.5) * 0.018,
+                rotY: (Math.random() - 0.5) * 0.018,
+                rotZ: (Math.random() - 0.5) * 0.01,
+                speed: 0.001 + Math.random() * 0.0015,
+                offset: Math.random() * Math.PI * 2
+            });
+        });
+
+        // Mouse & Touch Parallax Physics
+        let mouseX = 0, mouseY = 0;
+        let targetMouseX = 0, targetMouseY = 0;
+
+        function onPointerMove(e) {
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            targetMouseX = (x / window.innerWidth - 0.5) * 2;
+            targetMouseY = (y / window.innerHeight - 0.5) * 2;
+        }
+
+        window.addEventListener('mousemove', onPointerMove, { passive: true });
+        window.addEventListener('touchmove', onPointerMove, { passive: true });
+
+        // Resize Listener
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation Loop with Multi-Axis Floating & Orbital Motion Across Full Screen
+        let clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Smooth Mouse Interpolation
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            // Camera tilt
+            camera.position.x = mouseX * 3;
+            camera.position.y = -mouseY * 3;
+            camera.lookAt(0, 0, 0);
+
+            // Animate Objects across Full Viewport Space (Multi-Axis Floating + Drifting)
+            objects.forEach(obj => {
+                obj.mesh.rotation.x += obj.rotX;
+                obj.mesh.rotation.y += obj.rotY;
+                obj.mesh.rotation.z += obj.rotZ || 0;
+                obj.mesh.position.y = obj.baseY + Math.sin(elapsedTime * 1.2 + obj.offset) * 0.9;
+                obj.mesh.position.x = obj.baseX + Math.cos(elapsedTime * 0.8 + obj.offset) * 0.5;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    });
+
     // === DOM Elements ===
     const urlInput = document.getElementById('urlInput');
     const pasteBtn = document.getElementById('pasteBtn');
